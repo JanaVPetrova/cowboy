@@ -146,10 +146,11 @@ upgrade(Req0=#{version := Version}, Env, Handler, HandlerState, Opts) ->
 		%% Use a generic 400 error for HTTP/2.
 		{error, upgrade_required} ->
 			{ok, cowboy_req:reply(400, Req0), Env}
-	catch _:_ ->
+	catch ErrorClass:Exception:Stacktrace ->
 		%% @todo Probably log something here?
 		%% @todo Test that we can have 2 /ws 400 status code in a row on the same connection.
 		%% @todo Does this even work?
+		cowboy:log(error, "Error, ErrorClass: ~p, Exception: ~p, Stacktrace: ~p", [ErrorClass, Exception, Stacktrace]),
 		{ok, cowboy_req:reply(400, Req0), Env}
 	end.
 
